@@ -9,13 +9,6 @@ export const TripPlanner = () => {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-4">Plan a new trip</h2>
-        <button 
-          onClick={() => navigate('/new-trip')}
-          className="bg-coral-500 text-white px-8 py-3 rounded-full hover:bg-coral-600 transition-colors"
-        >
-          Start planning
-        </button>
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-4">
