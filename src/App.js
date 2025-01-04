@@ -22,6 +22,7 @@ import { TopDestinations } from './components/home/TopDestinations';
 import { ColomboGuide } from './components/guides/cities/ColomboGuide';
 import { GalleGuide } from './components/guides/cities/GalleGuide';
 import { PriceRangeSection } from './components/home/PriceRangeSection';
+import { VehicleFleet } from './components/home/VehicleFleet';
 
 // Create a Home component to contain all your existing sections
 const Home = () => {
@@ -36,6 +37,7 @@ const Home = () => {
       <ExplorePlaces/>
       <BudgetSection/>
       <AttractionsSection/>
+      <VehicleFleet/>
       <RoadTripSection/>
       <FeatureSlider/>
       <TopDestinations/>
