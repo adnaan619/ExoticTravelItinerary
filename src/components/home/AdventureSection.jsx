@@ -25,25 +25,25 @@ const adventures = [
     }
   },
   {
-    title: 'Puerto Rico Guide',
-    description: 'This is a collection of "best of" since I moved to the island at the beginning....',
-    image: 'https://images.unsplash.com/photo-1579687196544-08aeff951254',
+    title: 'Kandy: Cultural Capital Guide 🏛️',
+    description: 'Explore the ancient temples, botanical gardens, and cultural heritage of Kandy, Sri Lanka...',
+    image: 'https://images.unsplash.com/photo-1704797390857-640484bad286?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8a2FuZHl8ZW58MHx8MHx8fDA%3D',
     author: {
-      name: 'Gillian Morris',
+      name: 'Amara Silva',
       avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
       views: '28,075',
       likes: '142'
     }
   },
   {
-    title: 'Boston Walking Tour',
-    description: 'I lived in the area for 2 years during grad school and spent a lot of time exploring...',
-    image: 'https://images.unsplash.com/photo-1501979376754-1d09c1726c8f',
+    title: 'Ella: Mountain Paradise 🏔️',
+    description: 'A complete guide to Ella - from hiking Little Adam\'s Peak to the Nine Arch Bridge and tea plantations...',
+    image: 'https://images.unsplash.com/photo-1566766189268-ecac9118f2b7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fEVsbGF8ZW58MHx8MHx8fDA%3D',
     author: {
-      name: 'DX',
+      name: 'Kavinda Perera',
       avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-      views: '6,488',
-      likes: '91'
+      views: '15,488',
+      likes: '221'
     }
   }
 ];
@@ -56,6 +56,10 @@ export const AdventureSection = () => {
       navigate('/guides/japan-video-game');
     } else if (adventure.title.includes('Paris 5 Day')) {
       navigate('/guides/paris-5-day');
+    } else if (adventure.title.includes('Kandy: Cultural Capital')) {
+      navigate('/guides/kandy-cultural-guide');
+    } else if (adventure.title.includes('Ella: Mountain Paradise')) {
+      navigate('/guides/ella-mountain-guide');
     }
   };
 
@@ -65,15 +69,15 @@ export const AdventureSection = () => {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Find your next adventure</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Browse through itineraries and guides crafted by fellow travelers. Get inspired 
+            Browse through itineraries and guides crafted by fellow travelers. Get inspired
             by real experiences and detailed plans for your next adventure.
           </p>
         </div>
 
         <div className="grid grid-cols-4 gap-6 mb-12">
           {adventures.map((adventure) => (
-            <div 
-              key={adventure.title} 
+            <div
+              key={adventure.title}
               className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => handleCardClick(adventure)}
             >
