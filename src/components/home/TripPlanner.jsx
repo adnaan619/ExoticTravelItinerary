@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { TripMap } from '../map/TripMap';
 
 export const TripPlanner = () => {
   const [trips, setTrips] = useState([
@@ -47,6 +47,47 @@ export const TripPlanner = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [activeTab, setActiveTab] = useState('itinerary');
   const colomboCenter = { lat: 6.9271, lng: 79.8612 };
+
+  const [contentHeight, setContentHeight] = useState(0);
+  const contentRef = useRef(null);
+
+  const [mapLocations, setMapLocations] = useState([
+    {
+      id: 1,
+      type: 'attraction',
+      name: 'Gangaramaya Temple',
+      description: 'Historic Buddhist temple with museum',
+      rating: 4.7,
+      price: '$$',
+      images: ['temple-image.jpg'],
+      coordinates: { lat: 6.9167, lng: 79.8573 },
+      tags: ['Temple', 'Cultural', 'Must-See'],
+      openHours: '6:00 AM - 10:00 PM'
+    },
+    {
+      id: 2,
+      type: 'restaurant',
+      name: 'Ministry of Crab',
+      description: 'Famous seafood restaurant in historic Dutch Hospital',
+      rating: 4.8,
+      price: '$$$',
+      images: ['crab-image.jpg'],
+      coordinates: { lat: 6.9344, lng: 79.8428 },
+      tags: ['Seafood', 'Fine Dining'],
+      openHours: '12:00 PM - 10:30 PM'
+    },
+    // Add more locations...
+  ]);
+
+  const [activeLocation, setActiveLocation] = useState(null);
+  const [showDirections, setShowDirections] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.clientHeight / 2);
+    }
+  }, [activeTab]);
 
   const renderTabContent = () => {
     switch(activeTab) {
@@ -554,10 +595,33 @@ export const TripPlanner = () => {
     );
   };
 
+  const handleLocationSelect = (location) => {
+    setActiveLocation(location);
+  };
+
+  const handleLocationClose = () => {
+    setActiveLocation(null);
+  };
+
+  const handleGetDirections = async (location) => {
+    if (!window.google) return;
+    
+    const directionsService = new window.google.maps.DirectionsService();
+    
+    const result = await directionsService.route({
+      origin: colomboCenter,
+      destination: location.coordinates,
+      travelMode: window.google.maps.TravelMode.DRIVING,
+    });
+
+    setSelectedRoute(result);
+    setShowDirections(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="bg-gray-100/50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        <motion.div className="bg-white rounded-2xl shadow-lg overflow-hidden flex">
+        <motion.div className="bg-white rounded-2xl shadow-xl overflow-hidden flex h-[700px] border border-gray-100">
           {/* Left Section */}
           <div className="w-[45%] border-r">
             {/* Header */}
@@ -602,91 +666,49 @@ export const TripPlanner = () => {
             </div>
 
             {/* Content Area */}
-            <div className="h-[calc(100vh-200px)] overflow-y-auto">
-              <div className="p-6">
-                {renderTabContent()}
-              </div>
+            <div className="h-[calc(700px-180px)] overflow-hidden relative">
+              <motion.div 
+                className="absolute w-full"
+                animate={{ 
+                  y: [0, -contentHeight]
+                }}
+                transition={{
+                  duration: 15,
+                  ease: "linear",
+                  repeat: Infinity,
+                  repeatType: "mirror"
+                }}
+                onHoverStart={(e) => e.target.style.animationPlayState = 'paused'}
+                onHoverEnd={(e) => e.target.style.animationPlayState = 'running'}
+              >
+                <div className="p-6" ref={contentRef}>
+                  {renderTabContent()}
+                </div>
+                <div className="p-6">
+                  {renderTabContent()}
+                </div>
+              </motion.div>
+              
+              {/* Gradient Overlays */}
+              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+              <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white to-transparent pointer-events-none" />
             </div>
           </div>
 
           {/* Right Section - Map */}
           <div className="w-[55%] relative">
-            {/* Featured Location Card - Now at bottom right */}
-            <div className="absolute bottom-6 left-6 z-10 max-w-sm">
-              <motion.div 
-                className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <div className="flex p-3">
-                  <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                    <img 
-                      src="https://images.unsplash.com/photo-1589302168068-964664d93dc0" 
-                      alt="Colombo Skyline"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 ml-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">Galle Face Hotel</h3>
-                        <p className="text-xs text-gray-600">Colonial-era oceanfront hotel</p>
-                      </div>
-                      <button 
-                        className="p-1.5 hover:bg-gray-100 rounded-full"
-                        onClick={() => setSelectedLocation({
-                          type: 'hotel',
-                          coordinates: { lat: 6.9271, lng: 79.8612 }
-                        })}
-                      >
-                        📍
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1 text-xs">
-                      <div className="flex items-center">
-                        <span className="text-yellow-400">⭐</span>
-                        <span className="font-medium ml-0.5">4.8</span>
-                      </div>
-                      <span className="text-gray-300">•</span>
-                      <span className="text-gray-600">Heritage Hotel</span>
-                    </div>
-                    <div className="flex gap-1.5 mt-1.5">
-                      <span className="px-1.5 py-0.5 bg-coral-50 text-coral-600 rounded-full text-xs">
-                        Ocean View
-                      </span>
-                      <span className="px-1.5 py-0.5 bg-coral-50 text-coral-600 rounded-full text-xs">
-                        Colonial
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
-              <GoogleMap
-                mapContainerClassName="w-full h-[calc(100vh-100px)]"
-                center={colomboCenter}
-                zoom={13}
-                options={{
-                  styles: [{ /* Add custom map styles here */ }],
-                  disableDefaultUI: true,
-                  zoomControl: true,
-                  borderRadius: '0 1rem 1rem 0',
-                }}
-              >
-                {selectedLocation?.type === 'flight' && (
-                  <>
-                    <Marker position={selectedLocation.from} />
-                    <Marker position={selectedLocation.to} />
-                  </>
-                )}
-                
-                {selectedLocation?.type === 'hotel' && (
-                  <Marker position={selectedLocation.coordinates} />
-                )}
-              </GoogleMap>
-            </LoadScript>
+            <TripMap
+              center={colomboCenter}
+              locations={mapLocations}
+              activeLocation={activeLocation}
+              selectedLocation={selectedLocation}
+              showDirections={showDirections}
+              selectedRoute={selectedRoute}
+              onLocationSelect={handleLocationSelect}
+              onLocationClose={handleLocationClose}
+              onGetDirections={handleGetDirections}
+              mapContainerClassName="w-full h-[600px]"
+            />
           </div>
         </motion.div>
       </div>
